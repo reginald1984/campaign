@@ -1,3 +1,4 @@
+// backend/middleware/auth.js
 const User = require('../models/User');
 const asyncHandler = require('express-async-handler');
 const HttpError = require('./HttpError');
@@ -53,6 +54,4 @@ const protect = asyncHandler(async (req, res, next) => {
   }
 });
 
-
-
-module.exports = { protect};
+module.exports = { protect };

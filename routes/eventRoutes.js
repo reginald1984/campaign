@@ -1,80 +1,160 @@
 const express = require('express');
 const router = express.Router();
-const eventController = require('../controllers/EventController'); // Fixed: contrrollers -> controllers
-const { protect} = require('../middleware/auth');
+const eventController = require('../controllers/EventController');
+const { protect } = require('../middleware/auth');
 const {
   uploadEventFeaturedImage,
   uploadEventGalleryImages,
   handleEventUploadError,
 } = require('../middleware/event-upload');
 
-// ==================== PUBLIC ROUTES ====================
+// =============================================
+// PUBLIC ROUTES (No authentication required)
+// =============================================
 
-// Get upcoming events (with pagination and category filter)
+/**
+ * @route   GET /api/v1/events
+ * @desc    Get upcoming events (with pagination and category filter)
+ * @access  Public
+ */
 router.get('/events', eventController.getUpcomingEvents);
 
-// Get featured events
-router.get('/featured', eventController.getFeaturedEvents);
+/**
+ * @route   GET /api/v1/events/featured
+ * @desc    Get featured events
+ * @access  Public
+ */
+router.get('/events/featured', eventController.getFeaturedEvents);
 
-// Search events
-router.get('/search', eventController.searchEvents);
+/**
+ * @route   GET /api/v1/events/search
+ * @desc    Search events
+ * @access  Public
+ */
+router.get('/events/search', eventController.searchEvents);
 
-// Get event by slug (public)
+/**
+ * @route   GET /api/v1/events/slug/:slug
+ * @desc    Get event by slug
+ * @access  Public
+ */
 router.get('/events/slug/:slug', eventController.getEventBySlug);
 
-// Get events by category
-router.get('/category/:category', eventController.getEventsByCategory);
+/**
+ * @route   GET /api/v1/events/category/:category
+ * @desc    Get events by category
+ * @access  Public
+ */
+router.get('/events/category/:category', eventController.getEventsByCategory);
 
-// RSVP to an event (public)
-router.post('/:eventId/rsvp', eventController.rsvpToEvent);
+/**
+ * @route   GET /api/v1/events/:eventId
+ * @desc    Get event by ID
+ * @access  Public
+ */
+router.get('/events/:eventId', eventController.getEventById);
 
-// Cancel RSVP (public)
-router.delete('/:eventId/rsvp', eventController.cancelRSVP);
+/**
+ * @route   POST /api/v1/events/:eventId/rsvp
+ * @desc    RSVP to an event
+ * @access  Public
+ */
+router.post('/events/:eventId/rsvp', eventController.rsvpToEvent);
 
-// ==================== ADMIN ROUTES ====================
+/**
+ * @route   DELETE /api/v1/events/:eventId/rsvp
+ * @desc    Cancel RSVP
+ * @access  Public
+ */
+router.delete('/events/:eventId/rsvp', eventController.cancelRSVP);
 
-// Get all events for admin (with pagination and status filter)
-router.get('/admin/events', protect,  eventController.getAllEventsForAdmin);
+// =============================================
+// PROTECTED ROUTES (Authentication required)
+// =============================================
 
-// Get event statistics
-router.get('/admin/events/stats', protect,  eventController.getEventStats);
+// Apply authentication middleware to all routes below
+router.use(protect);
 
-// Get event RSVPs
-router.get('/admin/events/:eventId/rsvps', protect,  eventController.getEventRSVPs);
+/**
+ * @route   GET /api/v1/admin/events
+ * @desc    Get all events for admin (with pagination and status filter)
+ * @access  Private/Admin
+ */
+router.get('/admin/events', eventController.getAllEventsForAdmin);
 
-// Create new event
-router.post('/admin/new-events', protect,  eventController.createEvent);
-// Get event by ID (admin)
-router.get('/admin/events/:eventId', protect,  eventController.getEventById);
+/**
+ * @route   GET /api/v1/admin/events/stats
+ * @desc    Get event statistics
+ * @access  Private/Admin
+ */
+router.get('/admin/events/stats', eventController.getEventStats);
 
-// Update event
-router.put('/admin/update-events/:eventId', protect,  eventController.updateEvent);
+/**
+ * @route   GET /api/v1/admin/events/:eventId/rsvps
+ * @desc    Get event RSVPs
+ * @access  Private/Admin
+ */
+router.get('/admin/events/:eventId/rsvps', eventController.getEventRSVPs);
 
-// Delete event
-router.delete('/admin/events/:eventId', protect,  eventController.deleteEvent);
+/**
+ * @route   POST /api/v1/admin/events/new
+ * @desc    Create new event
+ * @access  Private/Admin
+ */
+router.post('/admin/events/new', eventController.createEvent);
 
-// Upload featured image for event
+/**
+ * @route   GET /api/v1/admin/events/:eventId
+ * @desc    Get event by ID (admin)
+ * @access  Private/Admin
+ */
+router.get('/admin/events/:eventId', eventController.getEventById);
+
+/**
+ * @route   PUT /api/v1/admin/events/update/:eventId
+ * @desc    Update event
+ * @access  Private/Admin
+ */
+router.put('/admin/events/update/:eventId', eventController.updateEvent);
+
+/**
+ * @route   DELETE /api/v1/admin/events/delete/:eventId
+ * @desc    Delete event
+ * @access  Private/Admin
+ */
+router.delete('/admin/events/delete/:eventId', eventController.deleteEvent);
+
+/**
+ * @route   POST /api/v1/admin/events/:eventId/featured-image
+ * @desc    Upload featured image for event
+ * @access  Private/Admin
+ */
 router.post(
   '/admin/events/:eventId/featured-image',
-  protect,
   uploadEventFeaturedImage.single('image'),
   handleEventUploadError,
   eventController.uploadFeaturedImage
 );
 
-// Upload gallery images for event
+/**
+ * @route   POST /api/v1/admin/events/:eventId/gallery
+ * @desc    Upload gallery images for event
+ * @access  Private/Admin
+ */
 router.post(
   '/admin/events/:eventId/gallery',
-  protect,
   uploadEventGalleryImages.array('images', 10),
   handleEventUploadError,
   eventController.uploadGalleryImages
 );
 
-// Remove gallery image
+/**
+ * @route   DELETE /api/v1/admin/events/:eventId/gallery/:publicId
+ * @desc    Remove gallery image
+ * @access  Private/Admin
+ */
 router.delete(
   '/admin/events/:eventId/gallery/:publicId',
-  protect,
   eventController.removeGalleryImage
 );
 

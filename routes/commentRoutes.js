@@ -8,21 +8,21 @@ const { protect } = require('../middleware/auth');
 // =============================================
 
 /**
- * @route   POST /api/comments
+ * @route   POST /api/v1/comments/new
  * @desc    Create a new comment
  * @access  Public
  */
 router.post('/comments/new', commentController.createComment);
 
 /**
- * @route   GET /api/comments/post/:postId
+ * @route   GET /api/v1/comments/post/:postId
  * @desc    Get comments for a specific post
  * @access  Public
  */
 router.get('/comments/post/:postId', commentController.getPostComments);
 
 /**
- * @route   GET /api/comments/:commentId/replies
+ * @route   GET /api/v1/comments/:commentId/replies
  * @desc    Get replies for a specific comment
  * @access  Public
  */
@@ -32,46 +32,49 @@ router.get('/comments/:commentId/replies', commentController.getCommentReplies);
 // ADMIN ROUTES (Authentication required)
 // =============================================
 
+// Apply authentication middleware to all admin routes below
+router.use(protect);
+
 /**
- * @route   GET /api/admin/comments
+ * @route   GET /api/v1/admin/comments
  * @desc    Get all comments for moderation
  * @access  Private/Admin
  */
-router.get('/admin/comments', protect, commentController.getAllCommentsForModeration);
+router.get('/admin/comments', commentController.getAllCommentsForModeration);
 
 /**
- * @route   GET /api/admin/comments/stats
+ * @route   GET /api/v1/admin/comments/stats
  * @desc    Get comment statistics
  * @access  Private/Admin
  */
-router.get('/admin/comments/stats', protect, commentController.getCommentStats);
+router.get('/admin/comments/stats', commentController.getCommentStats);
 
 /**
- * @route   PUT /api/admin/comments/:commentId/approve
+ * @route   PUT /api/v1/admin/comments/:commentId/approve
  * @desc    Approve a comment
  * @access  Private/Admin
  */
-router.put('/admin/comments/:commentId/approve', protect, commentController.approveComment);
+router.put('/admin/comments/:commentId/approve', commentController.approveComment);
 
 /**
- * @route   DELETE /api/admin/comments/:commentId
+ * @route   DELETE /api/v1/admin/comments/:commentId
  * @desc    Reject/Delete a comment
  * @access  Private/Admin
  */
-router.delete('/admin/comments/:commentId', protect, commentController.rejectComment);
+router.delete('/admin/comments/:commentId', commentController.rejectComment);
 
 /**
- * @route   POST /api/admin/comments/:commentId/spam
+ * @route   POST /api/v1/admin/comments/:commentId/spam
  * @desc    Mark comment as spam
  * @access  Private/Admin
  */
-router.post('/admin/comments/:commentId/spam', protect, commentController.markAsSpam);
+router.post('/admin/comments/:commentId/spam', commentController.markAsSpam);
 
 /**
- * @route   POST /api/admin/comments/:commentId/respond
+ * @route   POST /api/v1/admin/comments/:commentId/respond
  * @desc    Add admin response to comment
  * @access  Private/Admin
  */
-router.post('/admin/comments/:commentId/respond', protect, commentController.addAdminResponse);
+router.post('/admin/comments/:commentId/respond', commentController.addAdminResponse);
 
 module.exports = router;
