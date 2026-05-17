@@ -34,7 +34,7 @@ seedAdmin();
 // Enhanced CORS configuration for Edge compatibility
 const allowedOrigins = Array.isArray(ALLOWED_ORIGINS) 
   ? ALLOWED_ORIGINS 
-  : ['http://localhost:3000', 'http://127.0.0.1:8280', 'http://localhost:8280'];
+  : ['http://localhost:3000', 'http://127.0.0.1:8280', 'http://localhost:8280','https://campaign-22qf.onrender.com','https://campaign-lceh.onrender.com'];
 
 console.log('🔄 Allowed CORS origins:', allowedOrigins);
 
@@ -55,8 +55,8 @@ app.use(cors({
              allowed.includes(origin) ||
              origin.includes('localhost') ||
              origin.includes('127.0.0.1');
-            //  origin === 'https://darcollections.com' ||
-            //  origin === 'https://backend-x6tz.onrender.com';
+            origin === 'https://campaign-lceh.onrender.com' ||
+            origin === 'https://campaign-22qf.onrender.com';
     });
     
     if (isAllowed) {
@@ -145,25 +145,26 @@ app.use(express.urlencoded({
   parameterLimit: 100000
 }));
 
-// Enhanced cookie settings middleware for localhost compatibility
+// Enhanced cookie settings middleware - FIX THIS
 app.use((req, res, next) => {
   const originalCookie = res.cookie;
   
-  // Check if request is from localhost
+  // Check if request is from localhost OR your Render domain
   const isLocalhost = req.headers.origin?.includes('localhost') || 
                       req.headers.origin?.includes('127.0.0.1');
+  const isRenderDomain = req.headers.origin?.includes('onrender.com');
   
   res.cookie = function(name, value, options = {}) {
     const edgeCompatibleOptions = {
       httpOnly: options.httpOnly !== undefined ? options.httpOnly : true,
-      secure: !isLocalhost && NODE_ENV === 'production',
-      sameSite: isLocalhost ? 'lax' : 'none',
+      secure: !isLocalhost && NODE_ENV === 'production', // Secure on Render
+      sameSite: isLocalhost ? 'lax' : (isRenderDomain ? 'none' : 'lax'),
       maxAge: options.maxAge || 30 * 24 * 60 * 60 * 1000,
       path: options.path || '/',
-      domain: isLocalhost ? undefined : (NODE_ENV === 'production' ? '.onrender.com' : undefined),
+      domain: isLocalhost ? undefined : (isRenderDomain ? '.onrender.com' : undefined),
     };
     
-    console.log(`🍪 Setting cookie: ${name}`, edgeCompatibleOptions);
+    console.log(`🍪 Setting cookie: ${name} for domain: ${edgeCompatibleOptions.domain || 'current'}`);
     return originalCookie.call(this, name, value, edgeCompatibleOptions);
   };
   next();

@@ -117,7 +117,7 @@ router.delete('/posts/delete/:postId', protect, postController.deletePost);
  * @desc    Get post by ID (admin)
  * @access  Private/Admin
  */
-router.get('/posts/:postId', protect, postController.getPostById);
+router.get('/posts/:postId', postController.getPostById);
 
 /**
  * @route   POST /api/posts/:postId/featured-image

@@ -54,7 +54,7 @@ router.get('/volunteers', protect,  volunteerController.getAllVolunteers);
  * @desc    Get volunteer statistics
  * @access  Private/Admin
  */
-router.get('/volunteers/stats', protect, volunteerController.getVolunteerStats);
+router.get('/volunteers/stats', volunteerController.getVolunteerStats);
 
 /**
  * @route   GET /api/v1/volunteers/export

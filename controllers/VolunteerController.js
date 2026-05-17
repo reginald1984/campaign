@@ -211,7 +211,7 @@ class VolunteerController {
 
     res.status(200).json({
       success: true,
-      data: result.data
+      data: result.data 
     });
   });
 
