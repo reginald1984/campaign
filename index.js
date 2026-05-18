@@ -1,6 +1,5 @@
 const express = require('express');
 const dotenv = require('dotenv');
-const cookieParser = require('cookie-parser');
 const fs = require('fs');
 const http = require('http');
 const path = require('path');
@@ -11,8 +10,15 @@ const compression = require('compression');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const { Server } = require("socket.io");
-const {ALLOWED_ORIGINS} = require('./utils/allowedOrigins')
+const { ALLOWED_ORIGINS } = require('./utils/allowedOrigins');
 const seedAdmin = require('./scripts/seed-admin');
+// const userRoutes=require('./routes/userRoutes')
+// const eventRoutes=require('./routes/eventRoutes')
+// const postRoutes=require('./routes/postRoutes')
+// const subscribeRoutes=require('./routes/subscribeRoutes')
+// const volunteerRoutes=require('./routes/volunteerRoutes')
+// const messageRoutes=require('./routes/messageRoutes')
+// const commentRoutes=require('./routes/commentRoutes')
 // Load environment variables
 dotenv.config();
 
@@ -28,42 +34,43 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 
 // Database connection
 connectDB();
-seedAdmin(); 
-// Replace the CORS configuration section with this:
+seedAdmin();
 
-// Enhanced CORS configuration for Edge compatibility
+// Allowed origins configuration
 const allowedOrigins = Array.isArray(ALLOWED_ORIGINS) 
   ? ALLOWED_ORIGINS 
-  : ['http://localhost:3000', 'http://127.0.0.1:8280', 'http://localhost:8280','https://campaign-22qf.onrender.com','https://campaign-lceh.onrender.com'];
+  : [
+      'http://localhost:3000', 
+      'http://127.0.0.1:3000',
+      'http://localhost:8280', 
+      'http://127.0.0.1:8280',
+      'https://campaign-22qf.onrender.com',
+      'http://cheapcallme.com'
+    ];
 
 console.log('🔄 Allowed CORS origins:', allowedOrigins);
 
-// Enhanced CORS middleware - MUST BE FIRST MIDDLEWARE
+// =============================================
+// CORS CONFIGURATION (No cookies)
+// =============================================
 app.use(cors({
   origin: function(origin, callback) {
-    // Allow requests with no origin (like mobile apps, curl requests, Postman)
+    // Allow requests with no origin (like mobile apps, curl, Postman)
     if (!origin) return callback(null, true);
-    
-    // Log all incoming origins for debugging
-    console.log('🔍 Incoming origin:', origin);
     
     // Check if origin is allowed
     const isAllowed = allowedOrigins.some(allowed => {
-      // Handle exact matches or partial matches (for localhost variations)
       return origin === allowed || 
-             origin.includes(allowed) ||
-             allowed.includes(origin) ||
              origin.includes('localhost') ||
-             origin.includes('127.0.0.1');
-            origin === 'https://campaign-lceh.onrender.com' ||
-            origin === 'https://campaign-22qf.onrender.com';
+             origin.includes('127.0.0.1') ||
+             origin === 'https://campaign-22qf.onrender.com' ||
+             origin === 'http://cheapcallme.com';
     });
     
     if (isAllowed) {
       callback(null, true);
     } else {
       console.log('❌ CORS blocked for origin:', origin);
-      console.log('📋 Allowed origins:', allowedOrigins);
       callback(new Error('Not allowed by CORS'));
     }
   },
@@ -71,43 +78,31 @@ app.use(cors({
   allowedHeaders: [
     'Content-Type', 
     'Authorization', 
-    'x-cart-session-id',
-    'x-requested-with',
-    'Cookie',
-    'Cookies',
     'Accept',
-    'Origin',
-    'X-Requested-With',
-    'Access-Control-Allow-Origin',
-    'Access-Control-Allow-Credentials'
+    'Origin'
   ],
   exposedHeaders: [
-    'Set-Cookie',
-    'Date',
-    'ETag',
     'Content-Length',
-    'Access-Control-Allow-Origin',
-    'Access-Control-Allow-Credentials',
     'Content-Disposition'
   ],
-  credentials: true,
+  credentials: false, // No credentials needed since we're not using cookies
   preflightContinue: false,
   optionsSuccessStatus: 204,
   maxAge: 86400
 }));
 
-// Handle preflight requests explicitly
+// Handle preflight requests
 app.options('*', (req, res) => {
   res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
   res.header('Access-Control-Allow-Headers', 
-    'Content-Type, Authorization, x-cart-session-id, x-requested-with, Cookie, Cookies, Accept, Origin, X-Requested-With');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  res.header('Access-Control-Max-Age', '86400');
+    'Content-Type, Authorization, Accept, Origin');
   res.status(204).send();
 });
 
-// Security middleware with Edge compatibility
+// =============================================
+// SECURITY MIDDLEWARE
+// =============================================
 app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" },
   crossOriginEmbedderPolicy: false,
@@ -126,10 +121,9 @@ app.use(helmet({
 app.use(mongoSanitize());
 app.use(compression());
 
-// Enhanced cookie parser - must come before other middleware
-app.use(cookieParser());
-
-// Request parsing with increased limits for Edge
+// =============================================
+// REQUEST PARSING
+// =============================================
 app.use(bodyParser.urlencoded({ 
   extended: true, 
   limit: '50mb',
@@ -145,50 +139,24 @@ app.use(express.urlencoded({
   parameterLimit: 100000
 }));
 
-// Enhanced cookie settings middleware - FIX THIS
+// =============================================
+// LOGGING MIDDLEWARE
+// =============================================
 app.use((req, res, next) => {
-  const originalCookie = res.cookie;
-  
-  // Check if request is from localhost OR your Render domain
-  const isLocalhost = req.headers.origin?.includes('localhost') || 
-                      req.headers.origin?.includes('127.0.0.1');
-  const isRenderDomain = req.headers.origin?.includes('onrender.com');
-  
-  res.cookie = function(name, value, options = {}) {
-    const edgeCompatibleOptions = {
-      httpOnly: options.httpOnly !== undefined ? options.httpOnly : true,
-      secure: !isLocalhost && NODE_ENV === 'production', // Secure on Render
-      sameSite: isLocalhost ? 'lax' : (isRenderDomain ? 'none' : 'lax'),
-      maxAge: options.maxAge || 30 * 24 * 60 * 60 * 1000,
-      path: options.path || '/',
-      domain: isLocalhost ? undefined : (isRenderDomain ? '.onrender.com' : undefined),
-    };
-    
-    console.log(`🍪 Setting cookie: ${name} for domain: ${edgeCompatibleOptions.domain || 'current'}`);
-    return originalCookie.call(this, name, value, edgeCompatibleOptions);
-  };
-  next();
-});
-
-// Enhanced logging middleware for debugging
-app.use((req, res, next) => {
-  console.log('=== EDGE DEBUG REQUEST ===');
-  console.log('🍪 Cookies:', req.cookies);
+  console.log('=== REQUEST DEBUG ===');
   console.log('📨 Headers:', {
     'user-agent': req.headers['user-agent'],
-    'x-cart-session-id': req.headers['x-cart-session-id'],
-    'cookie': req.headers.cookie,
     'origin': req.headers.origin,
-    'authorization': req.headers.authorization ? 'Present' : 'Missing',
+    'authorization': req.headers.authorization ? 'Bearer [TOKEN]' : 'Missing',
     'accept': req.headers.accept,
     'content-type': req.headers['content-type']
   });
   console.log('🌐 Method & URL:', req.method, req.originalUrl);
-  console.log('======================');
+  console.log('===================');
   next();
 });
 
-if (NODE_ENV === 'DEVELOPMENT') {
+if (NODE_ENV === 'development') {
   app.use(morgan('dev'));
 } else {
   app.use(morgan('combined', { 
@@ -196,7 +164,9 @@ if (NODE_ENV === 'DEVELOPMENT') {
   }));
 }
 
-// Socket.io initialization
+// =============================================
+// SOCKET.IO INITIALIZATION
+// =============================================
 const io = new Server(server, {
   cors: {
     origin: function(origin, callback) {
@@ -213,9 +183,7 @@ const io = new Server(server, {
     methods: ["GET", "POST", "PATCH", "DELETE", "PUT"],
     allowedHeaders: [
       'Content-Type', 
-      'Authorization', 
-      'x-cart-session-id',
-      'Cookie',
+      'Authorization',
       'Origin'
     ],
     credentials: true,
@@ -226,6 +194,9 @@ const io = new Server(server, {
 
 logger.info('Socket.IO server initialized successfully');
 
+// =============================================
+// ROUTES LOADING
+// =============================================
 const loadRoutes = async () => {
   const files = await fs.promises.readdir('./routes');
   for (const routeFile of files) {
@@ -240,9 +211,16 @@ const loadRoutes = async () => {
     }
   }
 };
+
+app.use((req, res, next) => {
+  console.log('🔍 GLOBAL CHECK - Path:', req.path, 'Method:', req.method);
+  next();
+});
 loadRoutes();
 
-// Serve uploaded files statically with CORS
+// =============================================
+// STATIC FILES
+// =============================================
 app.use('/uploads', express.static(path.join(__dirname, 'uploads'), {
   setHeaders: (res, path) => {
     res.header('Access-Control-Allow-Origin', '*');
@@ -250,12 +228,13 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads'), {
   }
 }));
 
-// Global error handler with CORS
+// =============================================
+// GLOBAL ERROR HANDLER
+// =============================================
 app.use((error, req, res, next) => {
   console.log('❌ Global Error Handler:', error.message);
   
   res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
-  res.header('Access-Control-Allow-Credentials', 'true');
   
   if (req.file) {
     fs.unlink(req.file.path, err => {
@@ -294,16 +273,15 @@ app.use((error, req, res, next) => {
     error: {
       status: statusCode,
       message: message,
-      stack: NODE_ENV === 'DEVELOPMENT' ? error.stack : undefined,
+      stack: NODE_ENV === 'development' ? error.stack : undefined,
       timestamp: new Date().toISOString()
     }
   });
 });
 
-
-
-
-// Process error handlers
+// =============================================
+// PROCESS ERROR HANDLERS
+// =============================================
 process.on('uncaughtException', (err) => {
   logger.error('UNCAUGHT EXCEPTION! Shutting down...', { 
     error: err.message,
@@ -329,16 +307,15 @@ process.on('SIGTERM', () => {
   });
 });
 
-
-
-
-// Start server
+// =============================================
+// START SERVER
+// =============================================
 server.listen(PORT, '0.0.0.0', () => {
   console.log('🚀 Server started successfully');
   console.log(`📍 Port: ${PORT}`);
   console.log(`🌍 Environment: ${NODE_ENV}`);
   console.log(`🌐 Listening on: 0.0.0.0 (all interfaces)`);
   console.log(`✅ CORS Enabled for:`, allowedOrigins);
-  console.log(`🍪 Cookie support: ENHANCED FOR LOCALHOST`);
+  console.log(`🔐 Authentication: JWT Tokens only (no cookies)`);
   logger.info(`Server running on port ${PORT} in ${NODE_ENV} mode`);
 });

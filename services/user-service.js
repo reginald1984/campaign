@@ -205,7 +205,7 @@ async updateUserProfile(userId, updateData) {
     if (error.code === 11000 && error.keyPattern && error.keyPattern.email) {
       throw new HttpError('Email is already taken by another user', 400);
     }
-    
+     
     // Handle validation errors
     if (error.name === 'ValidationError') {
       const messages = Object.values(error.errors).map(err => err.message);

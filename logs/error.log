@@ -3453,3 +3453,91 @@
     at listenInCluster (node:net:2065:12)
     at node:net:2274:7
     at process.processTicksAndRejections (node:internal/process/task_queues:90:21)
+2026-05-18T02:11:14.114Z [ERROR]: Error: Not authorized to access this route
+    at C:\Users\Owner\Desktop\reactJS\my-web\backend\middleware\auth.js:22:11
+    at asyncUtilWrap (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express-async-handler\index.js:3:20)
+    at Layer.handle [as handle_request] (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\index.js:286:9
+    at router.process_params (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\index.js:280:10)
+    at router.handle (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\index.js:175:3)
+    at router (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\layer.js:95:5)
+2026-05-18T02:11:14.123Z [ERROR]: Error: Not authorized to access this route
+    at C:\Users\Owner\Desktop\reactJS\my-web\backend\middleware\auth.js:22:11
+    at asyncUtilWrap (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express-async-handler\index.js:3:20)
+    at Layer.handle [as handle_request] (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\index.js:286:9
+    at router.process_params (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\index.js:280:10)
+    at router.handle (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\index.js:175:3)
+    at router (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\layer.js:95:5)
+2026-05-18T02:11:14.134Z [ERROR]: Error: Not authorized to access this route
+    at C:\Users\Owner\Desktop\reactJS\my-web\backend\middleware\auth.js:22:11
+    at asyncUtilWrap (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express-async-handler\index.js:3:20)
+    at Layer.handle [as handle_request] (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\index.js:286:9
+    at router.process_params (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\index.js:280:10)
+    at router.handle (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\index.js:175:3)
+    at router (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\layer.js:95:5)
+2026-05-18T02:11:14.137Z [ERROR]: Error: Not authorized to access this route
+    at C:\Users\Owner\Desktop\reactJS\my-web\backend\middleware\auth.js:22:11
+    at asyncUtilWrap (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express-async-handler\index.js:3:20)
+    at Layer.handle [as handle_request] (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\index.js:286:9
+    at router.process_params (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\index.js:280:10)
+    at router.handle (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\index.js:175:3)
+    at router (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\layer.js:95:5)
+2026-05-18T02:11:14.168Z [ERROR]: Error: Not authorized to access this route
+    at C:\Users\Owner\Desktop\reactJS\my-web\backend\middleware\auth.js:22:11
+    at asyncUtilWrap (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express-async-handler\index.js:3:20)
+    at Layer.handle [as handle_request] (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\index.js:286:9
+    at router.process_params (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\index.js:280:10)
+    at router.handle (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\index.js:175:3)
+    at router (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\layer.js:95:5)
+2026-05-18T02:11:14.179Z [ERROR]: Error: Not authorized to access this route
+    at C:\Users\Owner\Desktop\reactJS\my-web\backend\middleware\auth.js:22:11
+    at asyncUtilWrap (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express-async-handler\index.js:3:20)
+    at Layer.handle [as handle_request] (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\index.js:286:9
+    at router.process_params (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\index.js:280:10)
+    at router.handle (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\index.js:175:3)
+    at router (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\layer.js:95:5)
+2026-05-18T02:13:10.465Z [ERROR]: Error: Not authorized to access this route
+    at C:\Users\Owner\Desktop\reactJS\my-web\backend\middleware\auth.js:22:11
+    at asyncUtilWrap (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express-async-handler\index.js:3:20)
+    at Layer.handle [as handle_request] (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\index.js:286:9
+    at router.process_params (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\index.js:280:10)
+    at router.handle (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\index.js:175:3)
+    at router (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\layer.js:95:5)
+2026-05-18T02:13:10.472Z [ERROR]: Error: Not authorized to access this route
+    at C:\Users\Owner\Desktop\reactJS\my-web\backend\middleware\auth.js:22:11
+    at asyncUtilWrap (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express-async-handler\index.js:3:20)
+    at Layer.handle [as handle_request] (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\layer.js:95:5)
+    at trim_prefix (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\index.js:328:13)
+    at C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\index.js:286:9
+    at router.process_params (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\index.js:346:12)
+    at next (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\index.js:280:10)
+    at router.handle (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\index.js:175:3)
+    at router (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\index.js:47:12)
+    at Layer.handle [as handle_request] (C:\Users\Owner\Desktop\reactJS\my-web\backend\node_modules\express\lib\router\layer.js:95:5)

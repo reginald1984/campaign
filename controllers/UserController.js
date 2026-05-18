@@ -16,25 +16,11 @@ class UserController {
     
     const result = await UserService.authenticateUser(email, password, ipAddress);
     
-    // Set cookies
-    res.cookie('token', result.data.token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
-    });
-    
-    res.cookie('refreshToken', result.data.refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 90 * 24 * 60 * 60 * 1000 // 90 days
-    });
-    
+    // NO COOKIES - just return tokens in response body
     res.status(200).json({
       success: true,
       message: 'Login successful',
-      data: result.data
+      data: result.data // Contains token and refreshToken
     });
   });
 
@@ -44,28 +30,19 @@ class UserController {
    * @access  Public
    */
   refreshToken = asyncHandler(async (req, res, next) => {
-    const refreshToken = req.body.refreshToken || req.cookies.refreshToken;
+    // Get refresh token from request body only (not from cookies)
+    const refreshToken = req.body.refreshToken;
+    
+    if (!refreshToken) {
+      return next(new HttpError('Refresh token is required', 400));
+    }
     
     const result = await UserService.refreshToken(refreshToken);
     
-    // Update cookies
-    res.cookie('token', result.data.token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 30 * 24 * 60 * 60 * 1000
-    });
-    
-    res.cookie('refreshToken', result.data.refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 90 * 24 * 60 * 60 * 1000
-    });
-    
+    // NO COOKIES - just return new tokens in response body
     res.status(200).json({
       success: true,
-      data: result.data
+      data: result.data // Contains new token and refreshToken
     });
   });
 
@@ -85,137 +62,133 @@ class UserController {
     });
   });
 
-/**
- * @desc    Update user profile
- * @route   PUT /api/users/profile
- * @access  Private
- */
-updateProfile = asyncHandler(async (req, res, next) => {
-  const userId = req.user._id;
-  const updateData = req.body;
-  
-  // Don't remove email - allow email updates
-  // Only remove truly sensitive fields
-  delete updateData.password;
-  delete updateData.role;
-  delete updateData.loginAttempts;
-  delete updateData.lockUntil;
-  
-  // IMPORTANT: Keep the email field if it exists
-  // Don't delete updateData.email
-  
-  const result = await UserService.updateUserProfile(userId, updateData);
-  
-  res.status(200).json({
-    success: true,
-    message: 'Profile updated successfully',
-    data: result.data
+  /**
+   * @desc    Update user profile
+   * @route   PUT /api/users/profile
+   * @access  Private
+   */
+  updateProfile = asyncHandler(async (req, res, next) => {
+    const userId = req.user._id;
+    const updateData = req.body;
+    
+    // Don't remove email - allow email updates
+    // Only remove truly sensitive fields
+    delete updateData.password;
+    delete updateData.role;
+    delete updateData.loginAttempts;
+    delete updateData.lockUntil;
+    
+    const result = await UserService.updateUserProfile(userId, updateData);
+    
+    res.status(200).json({
+      success: true,
+      message: 'Profile updated successfully',
+      data: result.data
+    });
   });
-});
-/**
- * @desc    Upload profile picture directly to Cloudinary
- * @route   POST /api/users/profile-picture
- * @access  Private
- */
-uploadProfilePictureDirect = asyncHandler(async (req, res, next) => {
-  console.log('=== Direct Profile Picture Upload ===');
-  
-  if (!req.file) {
-    return next(new HttpError('Please upload a file', 400));
-  }
-  
-  // req.file already contains Cloudinary URL from multer-storage-cloudinary
-  const userId = req.user._id;
-  const alt = req.body.alt || 'Profile picture';
-  
-  // Get Cloudinary info from multer
-  const cloudinaryResult = {
-    url: req.file.path, // Cloudinary URL
-    publicId: req.file.filename, // Cloudinary public ID
-    cloudinaryUrl: req.file.path
-  };
-  
-  // Update user in database
-  const user = await User.findById(userId);
-  if (!user) {
-    throw new HttpError('User not found', 404);
-  }
-  
-  // Delete old profile picture if exists
-  if (user.profilePicture && user.profilePicture.publicId) {
-    try {
-      await cloudinary.uploader.destroy(user.profilePicture.publicId);
-      console.log('Old profile picture deleted:', user.profilePicture.publicId);
-    } catch (deleteError) {
-      console.warn('Failed to delete old picture:', deleteError.message);
-    }
-  }
-  
-  // Update with new image
-  user.profilePicture = {
-    url: cloudinaryResult.url,
-    publicId: cloudinaryResult.publicId,
-    alt: alt,
-    cloudinaryUrl: cloudinaryResult.url
-  };
-  
-  await user.save();
-  
-  console.log('Profile picture updated successfully for user:', userId);
-  
-  res.status(200).json({
-    success: true,
-    message: 'Profile picture uploaded successfully',
-    data: {
-      profilePicture: user.profilePicture
-    }
-  });
-});
 
-/**
- * @desc    Upload cover image directly to Cloudinary
- * @route   POST /api/users/cover-image
- * @access  Private
- */
-uploadCoverImageDirect = asyncHandler(async (req, res, next) => {
-  console.log('=== Direct Cover Image Upload ===');
-  
-  if (!req.file) {
-    return next(new HttpError('Please upload a file', 400));
-  }
-  
-  const userId = req.user._id;
-  const alt = req.body.alt || 'Cover image';
-  
-  // Update user in database
-  const user = await User.findById(userId);
-  if (!user) {
-    throw new HttpError('User not found', 404);
-  }
-  
-  // Delete old cover image if exists
-  if (user.coverImage && user.coverImage.publicId) {
-    await cloudinary.uploader.destroy(user.coverImage.publicId);
-  }
-  
-  // Update with new image
-  user.coverImage = {
-    url: req.file.path,
-    publicId: req.file.filename,
-    alt: alt,
-    cloudinaryUrl: req.file.path
-  };
-  
-  await user.save();
-  
-  res.status(200).json({
-    success: true,
-    message: 'Cover image uploaded successfully',
-    data: {
-      coverImage: user.coverImage
+  /**
+   * @desc    Upload profile picture directly to Cloudinary
+   * @route   POST /api/users/profile-picture
+   * @access  Private
+   */
+  uploadProfilePictureDirect = asyncHandler(async (req, res, next) => {
+    console.log('=== Direct Profile Picture Upload ===');
+    
+    if (!req.file) {
+      return next(new HttpError('Please upload a file', 400));
     }
+    
+    const userId = req.user._id;
+    const alt = req.body.alt || 'Profile picture';
+    
+    // Get Cloudinary info from multer
+    const cloudinaryResult = {
+      url: req.file.path,
+      publicId: req.file.filename,
+      cloudinaryUrl: req.file.path
+    };
+    
+    // Update user in database
+    const user = await User.findById(userId);
+    if (!user) {
+      throw new HttpError('User not found', 404);
+    }
+    
+    // Delete old profile picture if exists
+    if (user.profilePicture && user.profilePicture.publicId) {
+      try {
+        await cloudinary.uploader.destroy(user.profilePicture.publicId);
+        console.log('Old profile picture deleted:', user.profilePicture.publicId);
+      } catch (deleteError) {
+        console.warn('Failed to delete old picture:', deleteError.message);
+      }
+    }
+    
+    // Update with new image
+    user.profilePicture = {
+      url: cloudinaryResult.url,
+      publicId: cloudinaryResult.publicId,
+      alt: alt,
+      cloudinaryUrl: cloudinaryResult.url
+    };
+    
+    await user.save();
+    
+    console.log('Profile picture updated successfully for user:', userId);
+    
+    res.status(200).json({
+      success: true,
+      message: 'Profile picture uploaded successfully',
+      data: {
+        profilePicture: user.profilePicture
+      }
+    });
   });
-});
+
+  /**
+   * @desc    Upload cover image directly to Cloudinary
+   * @route   POST /api/users/cover-image
+   * @access  Private
+   */
+  uploadCoverImageDirect = asyncHandler(async (req, res, next) => {
+    console.log('=== Direct Cover Image Upload ===');
+    
+    if (!req.file) {
+      return next(new HttpError('Please upload a file', 400));
+    }
+    
+    const userId = req.user._id;
+    const alt = req.body.alt || 'Cover image';
+    
+    const user = await User.findById(userId);
+    if (!user) {
+      throw new HttpError('User not found', 404);
+    }
+    
+    // Delete old cover image if exists
+    if (user.coverImage && user.coverImage.publicId) {
+      await cloudinary.uploader.destroy(user.coverImage.publicId);
+    }
+    
+    // Update with new image
+    user.coverImage = {
+      url: req.file.path,
+      publicId: req.file.filename,
+      alt: alt,
+      cloudinaryUrl: req.file.path
+    };
+    
+    await user.save();
+    
+    res.status(200).json({
+      success: true,
+      message: 'Cover image uploaded successfully',
+      data: {
+        coverImage: user.coverImage
+      }
+    });
+  });
 
   /**
    * @desc    Remove profile picture
@@ -510,10 +483,7 @@ uploadCoverImageDirect = asyncHandler(async (req, res, next) => {
     
     await UserService.logout(userId);
     
-    // Clear cookies
-    res.clearCookie('token');
-    res.clearCookie('refreshToken');
-    
+    // No cookies to clear
     res.status(200).json({
       success: true,
       message: 'Logged out successfully'

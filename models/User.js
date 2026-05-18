@@ -161,7 +161,7 @@ const userSchema = new mongoose.Schema({
   },
   donationCount: {
     type: Number,
-    default: 0
+    default: 0 
   },
   
   // System Fields
