@@ -45,7 +45,8 @@ const allowedOrigins = Array.isArray(ALLOWED_ORIGINS)
       'http://localhost:8280', 
       'http://127.0.0.1:8280',
       'https://campaign-22qf.onrender.com',
-      'http://cheapcallme.com'
+      'http://cheapcallme.com',
+    'https://cheapcallme.com'
     ];
 
 console.log('🔄 Allowed CORS origins:', allowedOrigins);
@@ -63,8 +64,9 @@ app.use(cors({
       return origin === allowed || 
              origin.includes('localhost') ||
              origin.includes('127.0.0.1') ||
-             origin === 'https://campaign-22qf.onrender.com' ||
-             origin === 'http://cheapcallme.com';
+             origin.includes('https://campaign-22qf.onrender.com') ||
+          origin.includes('https://cheapcallme.com')||
+           origin.includes('http://cheapcallme.com');
     });
     
     if (isAllowed) {
